@@ -1,0 +1,178 @@
+<section class="tokenomics">
+  <div class="container">
+    <h2 class="section-title">Tokenomia</h2>
+
+    <div class="price-section">
+      <div class="price-card">
+        <div class="price-header">
+          <div class="price-header-left">
+            <h3>Preço em Tempo Real</h3>
+            <div class="pair-info">
+              <span class="token-badge">CNTA</span>
+              <span class="pair-divider">/</span>
+              <span class="usd-badge">USD</span>
+            </div>
+          </div>
+          <button class="refresh-btn" (click)="refreshPrice()" [disabled]="price.loading" title="Atualizar preço">
+            <span class="refresh-icon" [class.spinning]="price.loading">⟳</span>
+          </button>
+        </div>
+
+        <div *ngIf="price.loading && !price.priceUsd" class="price-loading">
+          <div class="price-skeleton price-skeleton-large"></div>
+          <div class="price-skeleton-row">
+            <div class="price-skeleton price-skeleton-small"></div>
+            <div class="price-skeleton price-skeleton-small"></div>
+            <div class="price-skeleton price-skeleton-small"></div>
+          </div>
+        </div>
+
+        <div *ngIf="price.error && !price.loading" class="price-error">
+          <span class="error-icon">⚠️</span>
+          <p>{{ price.error }}</p>
+          <button class="btn btn-secondary error-retry-btn" (click)="refreshPrice()">Tentar Novamente</button>
+        </div>
+
+        <div *ngIf="price.priceUsd && !price.error" class="price-content">
+          <div class="price-main">
+            <span class="price-main-value">${{ formatNumber(price.priceUsd) }}</span>
+            <span
+              class="price-change-badge"
+              [class.positive]="isPositive"
+              [class.negative]="!isPositive"
+            >
+              <span class="change-arrow">{{ isPositive ? '▲' : '▼' }}</span>
+              {{ formatChange(price.change24h) }}%
+              <span class="change-period">24h</span>
+            </span>
+          </div>
+
+          <div class="price-stats">
+            <div class="price-stat">
+              <span class="price-stat-label">Volume (24h)</span>
+              <span class="price-stat-value">${{ formatCompact(price.volume24h) }}</span>
+            </div>
+            <div class="price-stat">
+              <span class="price-stat-label">FDV / MCAP</span>
+              <span class="price-stat-value">${{ formatCompact(price.marketCapUsd) }}</span>
+            </div>
+            <div class="price-stat">
+              <span class="price-stat-label">Atualizado</span>
+              <span class="price-stat-value">{{ formatDate(price.lastUpdated) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tokenomics-grid">
+      <div class="tokenomics-card">
+        <h3>Oferta Total</h3>
+        <p class="tokenomics-value">100.000.000 CNTA</p>
+      </div>
+      <div class="tokenomics-card">
+        <h3>Liquidez na Pool (Uniswap)</h3>
+        <p class="tokenomics-value">2.109.382,53 CNTA</p>
+      </div>
+      <div class="tokenomics-card">
+        <h3>Rede</h3>
+        <p class="tokenomics-value">Polygon</p>
+      </div>
+      <div class="tokenomics-card">
+        <h3>Contrato</h3>
+        <p class="tokenomics-value tokenomics-value-small">0xcf813748c978d7d2bf8d5eae8ba09d43fd2d23e9</p>
+      </div>
+    </div>
+
+    <div class="token-wallet-section">
+      <div class="wallet-card">
+        <div class="wallet-icon">💰</div>
+        <h3>Carteira Principal do Projeto</h3>
+        <p class="wallet-label">Onde estão armazenados os tokens do projeto</p>
+        <p class="wallet-address">0x79FD5AE7BF8f36fbddB2AA343Eeb58C208bffcEe</p>
+        <a href="https://polygonscan.com/address/0x79FD5AE7BF8f36fbddB2AA343Eeb58C208bffcEe" target="_blank" class="btn btn-primary">
+          Ver no PolygonScan
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="roadmap">
+  <div class="container">
+    <h2 class="section-title">Roadmap</h2>
+
+    <div class="timeline">
+      <div class="timeline-line"></div>
+
+      <div class="timeline-item timeline-item-left">
+        <div class="timeline-dot">
+          <div class="timeline-dot-inner">🔨</div>
+        </div>
+        <div class="timeline-card">
+          <div class="timeline-phase-badge">
+            <span class="timeline-phase-num">Fase 1</span>
+          </div>
+          <h3>Criação do Token</h3>
+          <ul>
+            <li>Criação do contrato inteligente</li>
+            <li>Desenvolvimento inicial</li>
+            <li>Lançamento do site institucional</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="timeline-item timeline-item-right">
+        <div class="timeline-dot">
+          <div class="timeline-dot-inner">📱</div>
+        </div>
+        <div class="timeline-card">
+          <div class="timeline-phase-badge">
+            <span class="timeline-phase-num">Fase 2</span>
+          </div>
+          <h3>Integração com Apps</h3>
+          <ul>
+            <li>Integração com ZapMoto</li>
+            <li>Integração com ServLink</li>
+            <li>Lançamento do App Connecta <span class="roadmap-tag">em desenvolvimento</span></li>
+            <li>Implantação de utilidade</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="timeline-item timeline-item-left">
+        <div class="timeline-dot">
+          <div class="timeline-dot-inner">🚀</div>
+        </div>
+        <div class="timeline-card">
+          <div class="timeline-phase-badge">
+            <span class="timeline-phase-num">Fase 3</span>
+          </div>
+          <h3>Crescimento da Comunidade</h3>
+          <ul>
+            <li>Expansão para novas cidades</li>
+            <li>Parcerias estratégicas</li>
+            <li>Crescimento do ecossistema</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="timeline-item timeline-item-right">
+        <div class="timeline-dot">
+          <div class="timeline-dot-inner">🏪</div>
+        </div>
+        <div class="timeline-card">
+          <div class="timeline-phase-badge">
+            <span class="timeline-phase-num">Fase 4</span>
+          </div>
+          <h3>Marketplace e Novos Serviços</h3>
+          <ul>
+            <li>Lançamento do Marketplace</li>
+            <li>Novos produtos</li>
+            <li>Expansão internacional</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
