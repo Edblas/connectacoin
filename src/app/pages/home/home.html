@@ -1,11 +1,11 @@
 <section id="home" class="hero">
   <div class="container">
     <div class="hero-content fade-in">
-      <h1 class="hero-title">CNTA connecta</h1>
-      <p class="hero-subtitle">Conectando mobilidade, serviços, inteligência artificial e blockchain</p>
+      <h1 class="hero-title">{{ 'HOME.TITLE' | translate }}</h1>
+      <p class="hero-subtitle">{{ 'HOME.SLOGAN' | translate }}</p>
       <div class="hero-buttons">
-        <a routerLink="/ecossistema" class="btn btn-primary">Conheça o Projeto</a>
-        <a href="https://app.uniswap.org/explore/tokens/polygon/0xcf813748c978d7d2bf8d5eae8ba09d43fd2d23e9" target="_blank" class="btn btn-secondary">Comprar na Uniswap</a>
+        <a routerLink="/ecossistema" class="btn btn-primary">{{ 'HOME.CTA_PROJECT' | translate }}</a>
+        <a href="https://app.uniswap.org/explore/tokens/polygon/0xcf813748c978d7d2bf8d5eae8ba09d43fd2d23e9" target="_blank" class="btn btn-secondary">{{ 'HOME.CTA_CONTRACT' | translate }}</a>
       </div>
     </div>
     <div class="hero-image">
@@ -16,13 +16,15 @@
 
 <section id="about" class="about">
   <div class="container">
-    <h2 class="section-title">Sobre o Projeto</h2>
+    <h2 class="section-title">{{ 'HOME.ABOUT_TITLE' | translate }}</h2>
     <div class="about-content">
-      <p class="about-text">Nosso token CNTA foi criado na rede Polygon com o objetivo de revolucionar a forma como interagimos com serviços digitais. Integrado a um ecossistema completo de aplicativos reais, oferecemos utilidade real e tangível para todos os holders.</p>
+      <p class="about-text">{{ 'HOME.ABOUT_TEXT_1' | translate }}</p>
+      <p class="about-text" style="margin-top: 1rem;">{{ 'HOME.ABOUT_TEXT_2' | translate }}</p>
       <div class="contract-card">
-        <h3>Contrato Inteligente</h3>
+        <h3>{{ 'HOME.CONTRACT_TITLE' | translate }}</h3>
+        <p class="contract-subtitle">{{ 'HOME.CONTRACT_SUBTITLE' | translate }}</p>
         <p class="contract-address">0xcf813748c978d7d2bf8d5eae8ba09d43fd2d23e9</p>
-        <a href="https://polygonscan.com/token/0xcf813748c978d7d2bf8d5eae8ba09d43fd2d23e9" target="_blank" class="btn btn-primary">Ver no PolygonScan</a>
+        <a href="https://polygonscan.com/token/0xcf813748c978d7d2bf8d5eae8ba09d43fd2d23e9" target="_blank" class="btn btn-primary">{{ 'HOME.CTA_CONTRACT' | translate }}</a>
       </div>
     </div>
   </div>

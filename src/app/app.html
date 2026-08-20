@@ -6,58 +6,93 @@
           <span class="logo-text">CNTA</span>
         </a>
       </div>
-      <ul class="nav-links">
+      <ul class="nav-links" [class.mobile-open]="menuOpen">
         <li>
           <a
             routerLink="/"
             routerLinkActive="active"
             [routerLinkActiveOptions]="{ exact: true }"
+            (click)="closeMobileMenu()"
           >
-            Início
+            {{ 'NAV.HOME' | translate }}
           </a>
         </li>
         <li>
           <a
             routerLink="/ecossistema"
             routerLinkActive="active"
+            (click)="closeMobileMenu()"
           >
-            Ecossistema
+            {{ 'NAV.ECOSYSTEM' | translate }}
           </a>
         </li>
         <li>
           <a
             routerLink="/metas"
             routerLinkActive="active"
+            (click)="closeMobileMenu()"
           >
-            Metas
+            {{ 'NAV.GOALS' | translate }}
           </a>
         </li>
         <li>
           <a
             routerLink="/whitepaper"
             routerLinkActive="active"
+            (click)="closeMobileMenu()"
           >
-            Whitepaper
+            {{ 'NAV.WHITEPAPER' | translate }}
           </a>
         </li>
         <li>
           <a
             routerLink="/tokenomia"
             routerLinkActive="active"
+            (click)="closeMobileMenu()"
           >
-            Tokenomia
+            {{ 'NAV.TOKENOMICS' | translate }}
           </a>
         </li>
         <li>
           <a
             routerLink="/ajuda"
             routerLinkActive="active"
+            (click)="closeMobileMenu()"
           >
-            Ajuda
+            {{ 'NAV.HELP' | translate }}
           </a>
         </li>
+        <li class="lang-switcher">
+          <button
+            type="button"
+            class="lang-btn"
+            [class.active]="currentLang === 'pt'"
+            (click)="switchLang('pt')"
+            [attr.aria-label]="'Português'"
+          >
+            {{ 'LANG.PT' | translate }}
+          </button>
+          <span class="lang-divider">|</span>
+          <button
+            type="button"
+            class="lang-btn"
+            [class.active]="currentLang === 'en'"
+            (click)="switchLang('en')"
+            [attr.aria-label]="'English'"
+          >
+            {{ 'LANG.EN' | translate }}
+          </button>
+        </li>
       </ul>
-      <div class="mobile-menu">☰</div>
+      <button
+        type="button"
+        class="mobile-menu"
+        (click)="toggleMobileMenu()"
+        [attr.aria-expanded]="menuOpen"
+        aria-label="Abrir menu"
+      >
+        {{ menuOpen ? '✕' : '☰' }}
+      </button>
     </nav>
   </div>
 </header>
@@ -68,6 +103,6 @@
 
 <footer class="footer">
   <div class="container">
-    <p>&copy; 2024 CNTA connecta. Todos os direitos reservados.</p>
+    <p>&copy; 2024 CNTA connecta. {{ 'FOOTER.RIGHTS' | translate }}</p>
   </div>
 </footer>

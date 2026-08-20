@@ -1,19 +1,19 @@
 <section class="tokenomics">
   <div class="container">
-    <h2 class="section-title">Tokenomia</h2>
+    <h2 class="section-title">{{ 'TOKENOMICS.TITLE' | translate }}</h2>
 
     <div class="price-section">
       <div class="price-card">
         <div class="price-header">
           <div class="price-header-left">
-            <h3>Preço em Tempo Real</h3>
+            <h3>{{ 'TOKENOMICS.PRICE_TITLE' | translate }}</h3>
             <div class="pair-info">
               <span class="token-badge">CNTA</span>
               <span class="pair-divider">/</span>
-              <span class="usd-badge">USD</span>
+              <span class="usd-badge">{{ 'TOKENOMICS.PAIR' | translate }}</span>
             </div>
           </div>
-          <button class="refresh-btn" (click)="refreshPrice()" [disabled]="price.loading" title="Atualizar preço">
+          <button class="refresh-btn" (click)="refreshPrice()" [disabled]="price.loading" [title]="'TOKENOMICS.REFRESH' | translate">
             <span class="refresh-icon" [class.spinning]="price.loading">⟳</span>
           </button>
         </div>
@@ -30,7 +30,7 @@
         <div *ngIf="price.error && !price.loading" class="price-error">
           <span class="error-icon">⚠️</span>
           <p>{{ price.error }}</p>
-          <button class="btn btn-secondary error-retry-btn" (click)="refreshPrice()">Tentar Novamente</button>
+          <button class="btn btn-secondary error-retry-btn" (click)="refreshPrice()">{{ 'TOKENOMICS.RETRY' | translate }}</button>
         </div>
 
         <div *ngIf="price.priceUsd && !price.error" class="price-content">
@@ -43,21 +43,21 @@
             >
               <span class="change-arrow">{{ isPositive ? '▲' : '▼' }}</span>
               {{ formatChange(price.change24h) }}%
-              <span class="change-period">24h</span>
+              <span class="change-period">{{ 'TOKENOMICS.PERIOD_24H' | translate }}</span>
             </span>
           </div>
 
           <div class="price-stats">
             <div class="price-stat">
-              <span class="price-stat-label">Volume (24h)</span>
+              <span class="price-stat-label">{{ 'TOKENOMICS.VOLUME_24H' | translate }}</span>
               <span class="price-stat-value">${{ formatCompact(price.volume24h) }}</span>
             </div>
             <div class="price-stat">
-              <span class="price-stat-label">FDV / MCAP</span>
+              <span class="price-stat-label">{{ 'TOKENOMICS.MCAP' | translate }}</span>
               <span class="price-stat-value">${{ formatCompact(price.marketCapUsd) }}</span>
             </div>
             <div class="price-stat">
-              <span class="price-stat-label">Atualizado</span>
+              <span class="price-stat-label">{{ 'TOKENOMICS.UPDATED' | translate }}</span>
               <span class="price-stat-value">{{ formatDate(price.lastUpdated) }}</span>
             </div>
           </div>
@@ -67,40 +67,40 @@
 
     <div class="tokenomics-grid">
       <div class="tokenomics-card">
-        <h3>Oferta Total</h3>
-        <p class="tokenomics-value">100.000.000 CNTA</p>
-      </div>
-      <div class="tokenomics-card">
-        <h3>Liquidez na Pool (Uniswap)</h3>
-        <p class="tokenomics-value">2.109.382,53 CNTA</p>
-      </div>
-      <div class="tokenomics-card">
-        <h3>Rede</h3>
-        <p class="tokenomics-value">Polygon</p>
-      </div>
-      <div class="tokenomics-card">
-        <h3>Contrato</h3>
-        <p class="tokenomics-value tokenomics-value-small">0xcf813748c978d7d2bf8d5eae8ba09d43fd2d23e9</p>
-      </div>
+      <h3>{{ 'TOKENOMICS.SUPPLY_TITLE' | translate }}</h3>
+      <p class="tokenomics-value">{{ 'TOKENOMICS.SUPPLY_VALUE' | translate }}</p>
     </div>
 
-    <div class="token-wallet-section">
-      <div class="wallet-card">
-        <div class="wallet-icon">💰</div>
-        <h3>Carteira Principal do Projeto</h3>
-        <p class="wallet-label">Onde estão armazenados os tokens do projeto</p>
-        <p class="wallet-address">0x79FD5AE7BF8f36fbddB2AA343Eeb58C208bffcEe</p>
-        <a href="https://polygonscan.com/address/0x79FD5AE7BF8f36fbddB2AA343Eeb58C208bffcEe" target="_blank" class="btn btn-primary">
-          Ver no PolygonScan
-        </a>
-      </div>
+    <div class="tokenomics-card">
+      <h3>{{ 'TOKENOMICS.POOL_TITLE' | translate }}</h3>
+      <p class="tokenomics-value">{{ 'TOKENOMICS.POOL_VALUE' | translate }}</p>
+    </div>
+
+    <div class="tokenomics-card">
+      <h3>{{ 'TOKENOMICS.NETWORK_TITLE' | translate }}</h3>
+      <p class="tokenomics-value">{{ 'TOKENOMICS.NETWORK_VALUE' | translate }}</p>
+    </div>
+
+    <div class="tokenomics-card">
+      <h3>{{ 'TOKENOMICS.CONTRACT_TITLE' | translate }}</h3>
+      <p class="tokenomics-value tokenomics-value-small">0xcf813748c978d7d2bf8d5eae8ba09d43fd2d23e9</p>
+    </div>
+  </div>
+
+    <div class="wallet-card">
+      <h3>{{ 'TOKENOMICS.WALLET_TITLE' | translate }}</h3>
+      <p class="wallet-subtitle">{{ 'TOKENOMICS.WALLET_SUBTITLE' | translate }}</p>
+      <p class="wallet-address">0x79FD5AE7BF8f36fbddB2AA343Eeb58C208bffcEe</p>
+      <a href="https://polygonscan.com/address/0x79FD5AE7BF8f36fbddB2AA343Eeb58C208bffcEe" target="_blank" class="btn btn-primary">
+        {{ 'TOKENOMICS.WALLET_BUTTON' | translate }}
+      </a>
     </div>
   </div>
 </section>
 
 <section class="roadmap">
   <div class="container">
-    <h2 class="section-title">Roadmap</h2>
+    <h2 class="section-title">{{ 'TOKENOMICS.ROADMAP_TITLE' | translate }}</h2>
 
     <div class="timeline">
       <div class="timeline-line"></div>
@@ -111,13 +111,13 @@
         </div>
         <div class="timeline-card">
           <div class="timeline-phase-badge">
-            <span class="timeline-phase-num">Fase 1</span>
+            <span class="timeline-phase-num">{{ 'TOKENOMICS.PHASE_1_NUM' | translate }}</span>
           </div>
-          <h3>Criação do Token</h3>
+          <h3>{{ 'TOKENOMICS.PHASE_1_TITLE' | translate }}</h3>
           <ul>
-            <li>Criação do contrato inteligente</li>
-            <li>Desenvolvimento inicial</li>
-            <li>Lançamento do site institucional</li>
+            <li>{{ 'TOKENOMICS.PHASE_1_L1' | translate }}</li>
+            <li>{{ 'TOKENOMICS.PHASE_1_L2' | translate }}</li>
+            <li>{{ 'TOKENOMICS.PHASE_1_L3' | translate }}</li>
           </ul>
         </div>
       </div>
@@ -128,14 +128,14 @@
         </div>
         <div class="timeline-card">
           <div class="timeline-phase-badge">
-            <span class="timeline-phase-num">Fase 2</span>
+            <span class="timeline-phase-num">{{ 'TOKENOMICS.PHASE_2_NUM' | translate }}</span>
           </div>
-          <h3>Integração com Apps</h3>
+          <h3>{{ 'TOKENOMICS.PHASE_2_TITLE' | translate }}</h3>
           <ul>
-            <li>Integração com ZapMoto</li>
-            <li>Integração com ServLink</li>
-            <li>Lançamento do App Connecta <span class="roadmap-tag">em desenvolvimento</span></li>
-            <li>Implantação de utilidade</li>
+            <li>{{ 'TOKENOMICS.PHASE_2_L1' | translate }}</li>
+            <li>{{ 'TOKENOMICS.PHASE_2_L2' | translate }}</li>
+            <li>{{ 'TOKENOMICS.PHASE_2_L3' | translate }} <span class="roadmap-tag">{{ 'TOKENOMICS.PHASE_2_L3_TAG' | translate }}</span></li>
+            <li>{{ 'TOKENOMICS.PHASE_2_L4' | translate }}</li>
           </ul>
         </div>
       </div>
@@ -146,13 +146,13 @@
         </div>
         <div class="timeline-card">
           <div class="timeline-phase-badge">
-            <span class="timeline-phase-num">Fase 3</span>
+            <span class="timeline-phase-num">{{ 'TOKENOMICS.PHASE_3_NUM' | translate }}</span>
           </div>
-          <h3>Crescimento da Comunidade</h3>
+          <h3>{{ 'TOKENOMICS.PHASE_3_TITLE' | translate }}</h3>
           <ul>
-            <li>Expansão para novas cidades</li>
-            <li>Parcerias estratégicas</li>
-            <li>Crescimento do ecossistema</li>
+            <li>{{ 'TOKENOMICS.PHASE_3_L1' | translate }}</li>
+            <li>{{ 'TOKENOMICS.PHASE_3_L2' | translate }}</li>
+            <li>{{ 'TOKENOMICS.PHASE_3_L3' | translate }}</li>
           </ul>
         </div>
       </div>
@@ -163,13 +163,13 @@
         </div>
         <div class="timeline-card">
           <div class="timeline-phase-badge">
-            <span class="timeline-phase-num">Fase 4</span>
+            <span class="timeline-phase-num">{{ 'TOKENOMICS.PHASE_4_NUM' | translate }}</span>
           </div>
-          <h3>Marketplace e Novos Serviços</h3>
+          <h3>{{ 'TOKENOMICS.PHASE_4_TITLE' | translate }}</h3>
           <ul>
-            <li>Lançamento do Marketplace</li>
-            <li>Novos produtos</li>
-            <li>Expansão internacional</li>
+            <li>{{ 'TOKENOMICS.PHASE_4_L1' | translate }}</li>
+            <li>{{ 'TOKENOMICS.PHASE_4_L2' | translate }}</li>
+            <li>{{ 'TOKENOMICS.PHASE_4_L3' | translate }}</li>
           </ul>
         </div>
       </div>

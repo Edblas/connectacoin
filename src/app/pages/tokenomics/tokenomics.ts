@@ -1,12 +1,13 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { TokenPriceService, TokenPrice } from '../../services/token-price.service';
 
 @Component({
   selector: 'app-tokenomics',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslateModule],
   templateUrl: './tokenomics.html',
   styleUrls: ['./tokenomics.scss']
 })
@@ -30,13 +31,26 @@ export class TokenomicsPage implements OnInit, OnDestroy {
     return this.price.change24h >= 0;
   }
 
-  constructor(private readonly tokenPriceService: TokenPriceService) {}
+  constructor(
+    private readonly tokenPriceService: TokenPriceService,
+    private readonly translate: TranslateService
+  ) {}
 
   ngOnInit() {
     this.tokenPriceService.price$
       .pipe(takeUntil(this.destroy$))
       .subscribe(price => {
-        this.price = { ...price };
+        const translated: TokenPrice = { ...price };
+        if (price.error) {
+          const loadingErrKey = 'TOKENOMICS.LOADING_ERROR';
+          const dataUnKey = 'TOKENOMICS.DATA_UNAVAILABLE';
+          if (price.error.includes('Não foi possível') || price.error.includes('Could not load')) {
+            translated.error = this.translate.instant(loadingErrKey);
+          } else {
+            translated.error = this.translate.instant(dataUnKey);
+          }
+        }
+        this.price = translated;
       });
   }
 
@@ -49,22 +63,29 @@ export class TokenomicsPage implements OnInit, OnDestroy {
     this.tokenPriceService.refresh();
   }
 
+  private getLocale(): string {
+    const curr: string = (this.translate.currentLang as unknown as string) || 'pt';
+    return curr === 'pt' ? 'pt-BR' : 'en-US';
+  }
+
   formatNumber(value: string | number | null): string {
     if (value === null || value === undefined) return '0.00';
     const num = typeof value === 'string' ? parseFloat(value) : value;
+    const locale = this.getLocale();
     if (isNaN(num)) return '0.00';
     if (num === 0) return '0.00';
     if (num < 0.0001) return num.toExponential(4);
     if (num < 1) return num.toFixed(8).replace(/\.?0+$/, '');
-    if (num < 1000) return num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    return num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    if (num < 1000) return num.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return num.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
 
   formatChange(value: number | null): string {
     if (value === null || value === undefined || isNaN(value)) return '0.00';
     const abs = Math.abs(value);
+    const locale = this.getLocale();
     if (abs < 0.01) return '0.00';
-    return abs.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return abs.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
 
   formatCompact(value: string | number | null): string {
@@ -84,7 +105,8 @@ export class TokenomicsPage implements OnInit, OnDestroy {
   formatDate(date: Date | null): string {
     if (!date) return '-';
     try {
-      return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      const locale = this.getLocale();
+      return date.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', second: '2-digit' });
     } catch {
       return '-';
     }
