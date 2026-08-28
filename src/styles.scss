@@ -1441,3 +1441,159 @@ section {
     gap: 0.25rem;
   }
 }
+
+/* ========== COMMUNITY (WHATSAPP CTA) ========== */
+.community {
+  padding-top: 6rem;
+  padding-bottom: 3rem;
+  background: radial-gradient(ellipse at top, rgba(16, 185, 129, 0.12) 0%, transparent 60%),
+              radial-gradient(ellipse at bottom right, rgba(59, 130, 246, 0.06) 0%, transparent 50%);
+}
+
+.community-card {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(34, 197, 94, 0.06) 50%, rgba(59, 130, 246, 0.06) 100%);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: 24px;
+  padding: 3rem;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2rem;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.community-content {
+  position: relative;
+  z-index: 2;
+  max-width: 620px;
+}
+
+.community-title {
+  font-size: 2.25rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  line-height: 1.15;
+}
+
+.community-icon {
+  font-size: 2.5rem;
+  filter: drop-shadow(0 2px 8px rgba(16, 185, 129, 0.4));
+}
+
+.community-subtitle {
+  font-size: 1.125rem;
+  color: var(--text-secondary);
+  line-height: 1.75;
+  margin-bottom: 2rem;
+}
+
+.community-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 16px 28px;
+  background: linear-gradient(135deg, #10b981, #22c55e);
+  color: white;
+  text-decoration: none;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 1.05rem;
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.3);
+  transition: all 0.3s ease;
+}
+
+.community-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(16, 185, 129, 0.45);
+  color: white;
+}
+
+.cta-icon {
+  font-size: 1.25rem;
+}
+
+.cta-arrow {
+  margin-left: 0.25rem;
+  transition: transform 0.3s ease;
+}
+
+.community-cta:hover .cta-arrow {
+  transform: translate(2px, -2px);
+}
+
+.community-decoration {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  flex-shrink: 0;
+}
+
+.community-blob {
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.25) 0%, rgba(34, 197, 94, 0.1) 40%, transparent 70%);
+  border-radius: 42% 58% 63% 37% / 45% 45% 55% 55%;
+  animation: pulse 4s ease-in-out infinite;
+}
+
+@media (max-width: 768px) {
+  .community {
+    padding-top: 5rem;
+    padding-bottom: 2rem;
+  }
+
+  .community-card {
+    grid-template-columns: 1fr;
+    padding: 2rem 1.5rem;
+    text-align: center;
+  }
+
+  .community-title {
+    font-size: 1.75rem;
+    justify-content: center;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .community-icon {
+    font-size: 2.25rem;
+  }
+
+  .community-subtitle {
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .community-cta {
+    padding: 14px 22px;
+    font-size: 1rem;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .community-decoration {
+    width: 140px;
+    height: 140px;
+    margin: 0 auto;
+    order: -1;
+  }
+}
+
+/* ========== CONTACT — WHATSAPP CARD ========== */
+.contact-card--whatsapp {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(34, 197, 94, 0.08) 100%);
+  border-color: rgba(16, 185, 129, 0.35);
+}
+
+.contact-card--whatsapp:hover {
+  border-color: var(--primary-green);
+  box-shadow: 0 10px 28px rgba(16, 185, 129, 0.15);
+}
+
+.contact-card--whatsapp h3 {
+  color: var(--primary-green);
+}
