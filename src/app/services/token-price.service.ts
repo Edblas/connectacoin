@@ -1,6 +1,6 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, interval, Subject, takeUntil, catchError, of, tap } from 'rxjs';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { BehaviorSubject, interval, Subject, takeUntil, catchError, of, tap, timeout, firstValueFrom } from 'rxjs';
 
 export interface TokenPrice {
   priceUsd: string | null;
@@ -13,12 +13,35 @@ export interface TokenPrice {
   error: string | null;
 }
 
+interface GeckoTokenAttrs {
+  price_usd?: unknown;
+  price_btc?: unknown;
+  price_change_percentage_24h?: unknown;
+  total_reserve_in_usd?: unknown;
+  normalized_total_supply?: unknown;
+  fdv_usd?: unknown;
+  fdv?: unknown;
+  market_cap_usd?: unknown;
+  volume_usd?: { h24?: unknown } | unknown;
+  volume_usd_24h?: unknown;
+}
+
+interface DexScreenerPair {
+  priceUsd?: string;
+  priceChange?: { h24?: number };
+  volume?: { h24?: number };
+  fdv?: number;
+  marketCap?: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class TokenPriceService implements OnDestroy {
 
-  private readonly API_URL = 'https://api.geckoterminal.com/api/v2/networks/polygon_pos/tokens/0xcf813748c978d7d2bf8d5eae8ba09d43fd2d23e9';
+  private readonly PRIMARY_API = 'https://api.geckoterminal.com/api/v2/networks/polygon_pos/tokens/0xcf813748c978d7d2bf8d5eae8ba09d43fd2d23e9';
+  private readonly FALLBACK_API = 'https://api.dexscreener.com/latest/dex/tokens/0xcf813748c978d7d2bf8d5eae8ba09d43fd2d23e9';
+  private readonly CONTRACT = '0xcf813748c978d7d2bf8d5eae8ba09d43fd2d23e9';
 
   private readonly destroy$ = new Subject<void>();
 
@@ -47,47 +70,135 @@ export class TokenPriceService implements OnDestroy {
     this.destroy$.complete();
   }
 
-  private fetchPrice() {
+  private toNumber(value: unknown): number {
+    if (value === null || value === undefined) return 0;
+    const n = typeof value === 'number' ? value : parseFloat(String(value));
+    return isNaN(n) ? 0 : n;
+  }
+
+  private async fetchPrice() {
     const current = this.priceSubject$.value;
     this.priceSubject$.next({ ...current, loading: true, error: null });
 
-    this.http.get<any>(this.API_URL)
-      .pipe(
-        tap(() => {}),
-        catchError(err => {
-          console.error('Erro ao buscar preço do token:', err);
-          this.priceSubject$.next({
-            ...current,
-            loading: false,
-            error: 'Não foi possível carregar o preço no momento. Tente novamente em instantes.'
-          });
-          return of(null);
-        })
-      )
-      .subscribe(data => {
-        if (!data || !data.data || !data.data.attributes) {
-          if (!this.priceSubject$.value.error) {
-            this.priceSubject$.next({
-              ...current,
-              loading: false,
-              error: 'Dados do token não disponíveis no momento.'
-            });
-          }
-          return;
-        }
+    try {
+      const fromPrimary = await firstValueFrom(
+        this.http.get<any>(this.PRIMARY_API).pipe(
+          timeout(12000),
+          catchError((err: HttpErrorResponse) => {
+            console.warn('[TokenPrice] GeckoTerminal falhou, tentando DexScreener:', err?.status || err?.message);
+            return of(null);
+          })
+        )
+      );
 
-        const attr = data.data.attributes;
+      let result = this.parseFromGeckoTerminal(fromPrimary);
+      if (!result) {
+        const fromFallback = await firstValueFrom(
+          this.http.get<any>(this.FALLBACK_API).pipe(
+            timeout(12000),
+            catchError(() => of(null))
+          )
+        );
+        result = this.parseFromDexScreener(fromFallback);
+      }
+
+      if (result) {
+        this.priceSubject$.next({ ...result, loading: false, error: null });
+      } else {
         this.priceSubject$.next({
-          priceUsd: attr.price_usd ?? null,
-          priceBtc: attr.price_btc ?? null,
-          change24h: attr.price_change_percentage_24h ?? null,
-          volume24h: attr.volume_usd_24h ?? null,
-          marketCapUsd: attr.fdv ?? null,
-          lastUpdated: new Date(),
+          ...current,
           loading: false,
-          error: null
+          error: 'Não foi possível carregar o preço no momento. Tente novamente em instantes.'
         });
+      }
+    } catch (err) {
+      console.error('[TokenPrice] Erro fatal ao buscar preço:', err);
+      this.priceSubject$.next({
+        ...current,
+        loading: false,
+        error: 'Não foi possível carregar o preço no momento. Tente novamente em instantes.'
       });
+    }
+  }
+
+  private parseFromGeckoTerminal(data: any): TokenPrice | null {
+    if (!data || !data.data || !data.data.attributes) return null;
+    const attr: GeckoTokenAttrs = data.data.attributes;
+
+    const rawPrice = attr.price_usd;
+    const reserve = this.toNumber(attr.total_reserve_in_usd);
+    const supply = this.toNumber(attr.normalized_total_supply);
+    let priceUsd = rawPrice;
+    if ((priceUsd === null || priceUsd === undefined || String(priceUsd) === 'null' || this.toNumber(priceUsd) === 0) && reserve > 0 && supply > 0) {
+      priceUsd = String(reserve / supply);
+    }
+
+    const volume24hRaw =
+      (attr.volume_usd && typeof attr.volume_usd === 'object' && (attr.volume_usd as any).h24 !== undefined && (attr.volume_usd as any).h24 !== null)
+        ? (attr.volume_usd as any).h24
+        : attr.volume_usd_24h;
+    const volume24h = volume24hRaw !== undefined && volume24hRaw !== null ? String(volume24hRaw) : null;
+
+    const rawFdv = attr.fdv_usd ?? attr.fdv;
+    const rawMarketCap = attr.market_cap_usd ?? rawFdv;
+    const priceNum = this.toNumber(priceUsd);
+    let marketCapUsd = rawMarketCap;
+    if ((marketCapUsd === null || marketCapUsd === undefined || String(marketCapUsd) === 'null') && priceNum > 0 && supply > 0) {
+      marketCapUsd = String(priceNum * supply);
+    }
+
+    const change24hRaw = attr.price_change_percentage_24h;
+    const change24h = (change24hRaw === undefined || change24hRaw === null || String(change24hRaw) === 'null')
+      ? null
+      : this.toNumber(change24hRaw);
+
+    return {
+      priceUsd: priceUsd !== undefined && priceUsd !== null && String(priceUsd) !== 'null' ? String(priceUsd) : null,
+      priceBtc: attr.price_btc !== undefined && attr.price_btc !== null ? String(attr.price_btc) : null,
+      change24h,
+      volume24h,
+      marketCapUsd: marketCapUsd !== undefined && marketCapUsd !== null && String(marketCapUsd) !== 'null' ? String(marketCapUsd) : null,
+      lastUpdated: new Date(),
+      loading: false,
+      error: null
+    };
+  }
+
+  private parseFromDexScreener(data: any): TokenPrice | null {
+    if (!data || !data.pairs || !Array.isArray(data.pairs) || data.pairs.length === 0) return null;
+
+    const pair: DexScreenerPair | undefined = data.pairs.find((p: any) =>
+      p && p.chainId === 'polygon' &&
+      (p.baseToken?.address?.toLowerCase() === this.CONTRACT.toLowerCase() ||
+       p.quoteToken?.address?.toLowerCase() === this.CONTRACT.toLowerCase())
+    ) ?? data.pairs[0];
+
+    if (!pair) return null;
+
+    const priceUsd = pair.priceUsd ? String(pair.priceUsd) : null;
+    const change24h = (pair.priceChange?.h24 !== undefined && pair.priceChange.h24 !== null) ? Number(pair.priceChange.h24) : null;
+    const volume24h = (pair.volume?.h24 !== undefined && pair.volume.h24 !== null) ? String(pair.volume.h24) : null;
+    const rawMarketCap = pair.marketCap ?? pair.fdv;
+    const priceNum = this.toNumber(priceUsd);
+    let marketCapUsd = rawMarketCap !== undefined && rawMarketCap !== null ? String(rawMarketCap) : null;
+
+    if ((!marketCapUsd || this.toNumber(marketCapUsd) === 0) && priceNum > 0) {
+      const supply = 100_000_000;
+      marketCapUsd = String(priceNum * supply);
+    }
+
+    if (!priceUsd || this.toNumber(priceUsd) === 0) return null;
+
+    return {
+      priceUsd,
+      priceBtc: null,
+      change24h,
+      volume24h,
+      marketCapUsd,
+      lastUpdated: new Date(),
+      loading: false,
+      error: null
+    };
   }
 
   public refresh() {
