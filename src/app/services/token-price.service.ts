@@ -15,15 +15,19 @@ export interface TokenPrice {
 
 interface GeckoTokenAttrs {
   price_usd?: unknown;
+  token_price_usd?: unknown;
+  base_token_price_usd?: unknown;
   price_btc?: unknown;
   price_change_percentage_24h?: unknown;
   total_reserve_in_usd?: unknown;
+  reserve_in_usd?: unknown;
   normalized_total_supply?: unknown;
   fdv_usd?: unknown;
   fdv?: unknown;
   market_cap_usd?: unknown;
   volume_usd?: { h24?: unknown } | unknown;
   volume_usd_24h?: unknown;
+  price_change_percentage?: { h24?: unknown };
 }
 
 interface DexScreenerPair {
@@ -39,7 +43,10 @@ interface DexScreenerPair {
 })
 export class TokenPriceService implements OnDestroy {
 
-  private readonly PRIMARY_API = 'https://api.geckoterminal.com/api/v2/networks/polygon_pos/tokens/0xcf813748c978d7d2bf8d5eae8ba09d43fd2d23e9';
+  private readonly POOL_ADDRESS = '0xe97736e1f51b7d7b6852a08b37eefa1779eee8e51a652db17f2301df9391a448';
+  private readonly PRIMARY_API = `https://api.geckoterminal.com/api/v2/networks/polygon_pos/pools/${this.POOL_ADDRESS}`;
+  private readonly SECONDARY_API = 'https://api.geckoterminal.com/api/v2/networks/polygon_pos/tokens/0xcf813748c978d7d2bf8d5eae8ba09d43fd2d23e9/pools';
+  private readonly LEGACY_TOKEN_API = 'https://api.geckoterminal.com/api/v2/networks/polygon_pos/tokens/0xcf813748c978d7d2bf8d5eae8ba09d43fd2d23e9';
   private readonly FALLBACK_API = 'https://api.dexscreener.com/latest/dex/tokens/0xcf813748c978d7d2bf8d5eae8ba09d43fd2d23e9';
   private readonly CONTRACT = '0xcf813748c978d7d2bf8d5eae8ba09d43fd2d23e9';
 
@@ -85,13 +92,31 @@ export class TokenPriceService implements OnDestroy {
         this.http.get<any>(this.PRIMARY_API).pipe(
           timeout(12000),
           catchError((err: HttpErrorResponse) => {
-            console.warn('[TokenPrice] GeckoTerminal falhou, tentando DexScreener:', err?.status || err?.message);
+            console.warn('[TokenPrice] Primary Pool Gecko falhou:', err?.status || err?.message);
             return of(null);
           })
         )
       );
 
-      let result = this.parseFromGeckoTerminal(fromPrimary);
+      let result = this.parseFromGeckoPool(fromPrimary);
+      if (!result) {
+        const fromSecondary = await firstValueFrom(
+          this.http.get<any>(this.SECONDARY_API).pipe(
+            timeout(12000),
+            catchError(() => of(null))
+          )
+        );
+        result = this.parseFromGeckoPoolsList(fromSecondary);
+      }
+      if (!result) {
+        const fromLegacy = await firstValueFrom(
+          this.http.get<any>(this.LEGACY_TOKEN_API).pipe(
+            timeout(12000),
+            catchError(() => of(null))
+          )
+        );
+        result = this.parseFromGeckoTerminal(fromLegacy);
+      }
       if (!result) {
         const fromFallback = await firstValueFrom(
           this.http.get<any>(this.FALLBACK_API).pipe(
@@ -154,6 +179,65 @@ export class TokenPriceService implements OnDestroy {
 
     return {
       priceUsd: priceUsd !== undefined && priceUsd !== null && String(priceUsd) !== 'null' ? String(priceUsd) : null,
+      priceBtc: attr.price_btc !== undefined && attr.price_btc !== null ? String(attr.price_btc) : null,
+      change24h,
+      volume24h,
+      marketCapUsd: marketCapUsd !== undefined && marketCapUsd !== null && String(marketCapUsd) !== 'null' ? String(marketCapUsd) : null,
+      lastUpdated: new Date(),
+      loading: false,
+      error: null
+    };
+  }
+
+  private parseFromGeckoPool(data: any): TokenPrice | null {
+    if (!data || !data.data || !data.data.attributes) return null;
+    const attr: GeckoTokenAttrs = data.data.attributes;
+    return this.buildFromPoolAttrs(attr);
+  }
+
+  private parseFromGeckoPoolsList(data: any): TokenPrice | null {
+    if (!data || !data.data || !Array.isArray(data.data) || data.data.length === 0) return null;
+    const first = data.data.find((p: any) => p?.attributes?.address?.toLowerCase() === this.POOL_ADDRESS.toLowerCase()) ?? data.data[0];
+    if (!first || !first.attributes) return null;
+    return this.buildFromPoolAttrs(first.attributes as GeckoTokenAttrs);
+  }
+
+  private buildFromPoolAttrs(attr: GeckoTokenAttrs): TokenPrice | null {
+    const rawPrice = attr.base_token_price_usd ?? attr.token_price_usd ?? attr.price_usd;
+    const reserve = this.toNumber(attr.reserve_in_usd ?? attr.total_reserve_in_usd);
+    const supply = this.toNumber(attr.normalized_total_supply) || 100_000_000;
+
+    let priceUsd = rawPrice;
+    if ((priceUsd === null || priceUsd === undefined || String(priceUsd) === 'null' || this.toNumber(priceUsd) === 0) && reserve > 0 && supply > 0) {
+      priceUsd = String(reserve / supply);
+    }
+
+    const priceNum = this.toNumber(priceUsd);
+    if (priceNum <= 0) return null;
+
+    const volume24hRaw =
+      (attr.volume_usd && typeof attr.volume_usd === 'object' && (attr.volume_usd as any).h24 !== undefined && (attr.volume_usd as any).h24 !== null)
+        ? (attr.volume_usd as any).h24
+        : attr.volume_usd_24h;
+    const volume24h = volume24hRaw !== undefined && volume24hRaw !== null ? String(volume24hRaw) : null;
+
+    const changeObj = attr.price_change_percentage;
+    const change24hRaw = (changeObj && typeof changeObj === 'object' && (changeObj as any).h24 !== undefined)
+      ? (changeObj as any).h24
+      : attr.price_change_percentage_24h;
+    const change24h = (change24hRaw === undefined || change24hRaw === null || String(change24hRaw) === 'null')
+      ? null
+      : this.toNumber(change24hRaw);
+
+    const rawFdv = attr.fdv_usd ?? attr.fdv;
+    const rawMarketCap = attr.market_cap_usd ?? rawFdv;
+    let marketCapUsd = rawMarketCap;
+    if ((marketCapUsd === null || marketCapUsd === undefined || String(marketCapUsd) === 'null' || this.toNumber(marketCapUsd) === 0) && priceNum > 0 && supply > 0) {
+      marketCapUsd = String(priceNum * supply);
+    }
+
+    return {
+      priceUsd: String(priceUsd),
       priceBtc: attr.price_btc !== undefined && attr.price_btc !== null ? String(attr.price_btc) : null,
       change24h,
       volume24h,
