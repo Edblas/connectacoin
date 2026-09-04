@@ -1766,3 +1766,58 @@ section {
     gap: 1.25rem;
   }
 }
+
+
+/* ========== FOUNDER SOCIAL / LINKEDIN BUTTON ========== */
+.founder-socials {
+  margin-top: 1.75rem;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.founder-linkedin-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.85rem 1.5rem;
+  background: linear-gradient(135deg, #0a66c2 0%, #004182 100%);
+  color: white !important;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition: all 0.25s ease;
+  box-shadow: 0 6px 18px rgba(10, 102, 194, 0.25);
+  border: 1px solid rgba(10, 102, 194, 0.4);
+}
+
+.founder-linkedin-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(10, 102, 194, 0.35);
+  background: linear-gradient(135deg, #004182 0%, #0a66c2 100%);
+  color: white !important;
+}
+
+.founder-linkedin-icon {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.founder-linkedin-arrow {
+  font-size: 0.95rem;
+  opacity: 0.9;
+}
+
+@media (max-width: 768px) {
+  .founder-socials {
+    justify-content: center;
+    margin-top: 1.5rem;
+  }
+
+  .founder-linkedin-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 1rem 1.25rem;
+  }
+}
