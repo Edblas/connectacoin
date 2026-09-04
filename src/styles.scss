@@ -1617,6 +1617,202 @@ section {
 }
 
 
+/* ========== HOW TO EARN CNTA / COMO GANHAR TOKENS ========== */
+.how-to-earn {
+  padding: 5rem 0;
+  background: linear-gradient(180deg, var(--dark-bg) 0%, rgba(59, 130, 246, 0.05) 50%, var(--dark-bg) 100%);
+}
+
+.howtoearn-subtitle {
+  text-align: center;
+  font-size: 1.15rem;
+  color: var(--text-secondary);
+  margin-top: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.howtoearn-callout {
+  max-width: 900px;
+  margin: 0 auto 3rem auto;
+  padding: 1.5rem 2rem;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.12) 0%, rgba(59, 130, 246, 0.12) 100%);
+  border: 1px solid rgba(34, 197, 94, 0.25);
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  backdrop-filter: blur(8px);
+}
+
+.howtoearn-callout-icon {
+  font-size: 1.6rem;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.howtoearn-callout-text {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.howtoearn-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.75rem;
+  margin-bottom: 3.5rem;
+}
+
+.step-card {
+  background: var(--surface-bg);
+  border: 1px solid rgba(139, 92, 246, 0.15);
+  border-radius: 18px;
+  padding: 2.25rem 1.75rem 2rem 1.75rem;
+  position: relative;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.2);
+}
+
+.step-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(59, 130, 246, 0.4);
+  box-shadow: 0 14px 40px rgba(59, 130, 246, 0.18);
+}
+
+.step-number {
+  position: absolute;
+  top: -22px;
+  right: 1.75rem;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary-blue), var(--primary-purple));
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.1rem;
+  box-shadow: 0 6px 18px rgba(139, 92, 246, 0.45);
+}
+
+.step-icon {
+  font-size: 2.75rem;
+  line-height: 1;
+  margin-bottom: 1rem;
+}
+
+.step-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.75rem;
+  background: linear-gradient(135deg, var(--primary-blue), var(--primary-purple));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.step-desc {
+  color: var(--text-secondary);
+  font-size: 0.97rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.howtoearn-cta {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 2.5rem 2rem;
+  text-align: center;
+  border-radius: 22px;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
+  border: 1px solid rgba(139, 92, 246, 0.25);
+}
+
+.howtoearn-cta-title {
+  font-size: 1.65rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 0.6rem;
+}
+
+.howtoearn-cta-desc {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+.howtoearn-cta-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+
+.howtoearn-cta-link {
+  display: inline-block;
+  color: var(--primary-blue);
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.howtoearn-cta-link:hover {
+  color: var(--primary-purple);
+  transform: translateX(2px);
+}
+
+@media (max-width: 768px) {
+  .how-to-earn {
+    padding: 3.5rem 0;
+  }
+
+  .howtoearn-callout {
+    padding: 1.25rem 1.5rem;
+    flex-direction: column;
+    gap: 0.6rem;
+    align-items: flex-start;
+  }
+
+  .howtoearn-callout-icon {
+    margin-top: 0;
+  }
+
+  .howtoearn-steps {
+    gap: 2.25rem;
+  }
+
+  .step-card {
+    padding: 2.25rem 1.4rem 1.75rem 1.4rem;
+  }
+
+  .step-number {
+    right: 1.4rem;
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+
+  .howtoearn-cta {
+    padding: 2rem 1.5rem;
+  }
+
+  .howtoearn-cta-title {
+    font-size: 1.4rem;
+  }
+
+  .howtoearn-cta-buttons .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+
 /* ========== FOUNDER / SOBRE O CRIADOR ========== */
 .founder {
   padding: 5rem 0;
