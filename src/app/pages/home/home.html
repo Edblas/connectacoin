@@ -82,8 +82,16 @@
       <h3 class="howtoearn-cta-title">{{ 'HOME.HOWTOEARN_CTA_TITLE' | translate }}</h3>
       <p class="howtoearn-cta-desc">{{ 'HOME.HOWTOEARN_CTA_DESC' | translate }}</p>
       <div class="howtoearn-cta-buttons">
-        <a routerLink="/ecossistema" class="btn btn-primary">{{ 'HOME.HOWTOEARN_CTA_ZAP' | translate }}</a>
-        <a routerLink="/ecossistema" class="btn btn-secondary">{{ 'HOME.HOWTOEARN_CTA_SERV' | translate }}</a>
+        <a href="https://play.google.com/store/search?q=zapmoto&c=apps&hl=pt_BR" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+          <span class="btn-icon">▶</span>
+          {{ 'HOME.HOWTOEARN_CTA_ZAP' | translate }}
+          <span class="btn-badge btn-badge--playstore">Google Play</span>
+        </a>
+        <a href="https://play.google.com/store/apps/details?id=com.servlink.app&hl=pt_BR" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+          <span class="btn-icon">▶</span>
+          {{ 'HOME.HOWTOEARN_CTA_SERV' | translate }}
+          <span class="btn-badge btn-badge--playstore">Google Play</span>
+        </a>
       </div>
       <a routerLink="/ecossistema" class="howtoearn-cta-link">{{ 'HOME.HOWTOEARN_CTA_ECO' | translate }} →</a>
     </div>

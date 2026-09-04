@@ -331,6 +331,100 @@ section {
   border-radius: 20px;
 }
 
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.card-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  border-radius: 999px;
+  white-space: nowrap;
+  line-height: 1;
+  border: 1px solid;
+  flex-shrink: 0;
+}
+
+.card-badge--playstore {
+  color: #8ab4f8;
+  background: rgba(66, 133, 244, 0.1);
+  border-color: rgba(66, 133, 244, 0.35);
+}
+
+.card-badge--web {
+  color: #34d399;
+  background: rgba(52, 211, 153, 0.1);
+  border-color: rgba(52, 211, 153, 0.35);
+}
+
+.ecosystem-card a .card-link,
+.ecosystem-card .card-link {
+  margin-top: 1.25rem;
+}
+
+.btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.btn-icon {
+  font-size: 0.95rem;
+  opacity: 0.9;
+  line-height: 1;
+}
+
+.btn-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.22rem 0.55rem;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  border-radius: 999px;
+  line-height: 1;
+  border: 1px solid;
+  text-transform: uppercase;
+  margin-left: 0.25rem;
+}
+
+.btn-badge--playstore {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.28);
+}
+
+.btn-secondary .btn-badge--playstore {
+  background: rgba(66, 133, 244, 0.1);
+  color: #8ab4f8;
+  border-color: rgba(66, 133, 244, 0.35);
+}
+
+@media (max-width: 768px) {
+  .card-header {
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+
+  .btn-badge {
+    font-size: 0.62rem;
+    padding: 0.2rem 0.45rem;
+  }
+}
+
 /* ========== TOKENOMICS ========== */
 .tokenomics {
   padding-top: 6rem;
