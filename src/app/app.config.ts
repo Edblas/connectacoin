@@ -1,14 +1,257 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners, importProvidersFrom } from '@angular/core';
+import { ApplicationConfig, importProvidersFrom, ErrorHandler, Injectable } from '@angular/core';
 import { provideRouter } from '@angular/router';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, HttpErrorResponse } from '@angular/common/http';
 import { TranslateModule, TranslateLoader, MissingTranslationHandler, MissingTranslationHandlerParams } from '@ngx-translate/core';
-import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { HttpClient } from '@angular/common/http';
 
 import { routes } from './app.routes';
+import { timeout, catchError, of, map } from 'rxjs';
+
+const FALLBACK_PT: Record<string, any> = {
+  NAV: { HOME: 'Início', ECOSYSTEM: 'Ecossistema', GOALS: 'Metas', WHITEPAPER: 'Whitepaper', TOKENOMICS: 'Tokenomia', HELP: 'Ajuda' },
+  LANG: { PT: 'PT', EN: 'EN' },
+  HOME: {
+    TITLE: 'CNTA connecta',
+    SLOGAN: 'Conectando mobilidade, serviços, inteligência artificial e blockchain.',
+    CTA_PROJECT: 'Conheça o Projeto',
+    CTA_CONTRACT: 'Ver Contrato',
+    ABOUT_TITLE: 'Sobre o Projeto',
+    ABOUT_TEXT_1: 'O CNTA connecta é um token criado na rede Polygon com o propósito de oferecer utilidade real dentro de um ecossistema de aplicativos e serviços já existentes.',
+    ABOUT_TEXT_2: 'Nosso objetivo é conectar mobilidade urbana, prestação de serviços, conteúdo musical produzido com inteligência artificial e tecnologia blockchain em um só lugar.',
+    CONTRACT_TITLE: 'Contrato Inteligente',
+    CONTRACT_SUBTITLE: 'Rede Polygon',
+    CONTRACT_COPIED: 'Copiado!',
+    FOUNDER_TITLE: 'Por Trás do CNTA',
+    FOUNDER_SUBTITLE: 'Sobre o Criador',
+    FOUNDER_AVATAR: '👨‍💻',
+    FOUNDER_NAME: 'Adílio',
+    FOUNDER_ROLE: 'Fundador & Desenvolvedor do CNTA',
+    FOUNDER_BIO_P1: 'Sou desenvolvedor e empreendedor apaixonado por tecnologia blockchain e mobilidade urbana. Construí o ecossistema CNTA do zero, cuidando pessoalmente de cada etapa: desde o smart contract na rede Polygon até os aplicativos ZapMoto, ServLink e Connecta.',
+    FOUNDER_BIO_P2: 'Acredito em utilidade real em vez de promessas vazias: cada linha de código e cada integração têm como objetivo conectar pessoas, serviços e oportunidades de forma transparente e sustentável.',
+    FOUNDER_CTA_LINKEDIN: 'Conectar no LinkedIn',
+    FOUNDER_PILLAR_1_ICON: '🔨',
+    FOUNDER_PILLAR_1_TITLE: 'Execução Prática',
+    FOUNDER_PILLAR_1_DESC: 'Aplicativos já no ar com usuários reais (ZapMoto e ServLink) antes de qualquer promessa.',
+    FOUNDER_PILLAR_2_ICON: '🌱',
+    FOUNDER_PILLAR_2_TITLE: 'Sustentabilidade',
+    FOUNDER_PILLAR_2_DESC: 'Receita real dos serviços e parte dos lucros injetados na liquidez do token.',
+    FOUNDER_PILLAR_3_ICON: '🤝',
+    FOUNDER_PILLAR_3_TITLE: 'Transparência',
+    FOUNDER_PILLAR_3_DESC: 'Toda decisão importante e o progresso das metas são compartilhados com a comunidade.',
+    HOWTOEARN_TITLE: 'Como Ganhar Tokens CNTA?',
+    HOWTOEARN_SUBTITLE: 'É muito simples: acumule pontos e receba tokens reais',
+    HOWTOEARN_CALLOUT: 'Os pontos CNTA acumulados nos aplicativos serão convertidos em tokens CNTA.',
+    HOWTOEARN_STEP_1_NUM: '1',
+    HOWTOEARN_STEP_1_ICON: '📱',
+    HOWTOEARN_STEP_1_TITLE: 'Baixe Nossos Apps',
+    HOWTOEARN_STEP_1_DESC: 'Comece instalando o ZapMoto ou ServLink, os aplicativos oficiais do ecossistema CNTA.',
+    HOWTOEARN_STEP_2_NUM: '2',
+    HOWTOEARN_STEP_2_ICON: '🏆',
+    HOWTOEARN_STEP_2_TITLE: 'Ganhe Pontos CNTA',
+    HOWTOEARN_STEP_2_DESC: 'Use os serviços, participe de ações e cumpra metas para acumular pontos CNTA diariamente.',
+    HOWTOEARN_STEP_3_NUM: '3',
+    HOWTOEARN_STEP_3_ICON: '🪙',
+    HOWTOEARN_STEP_3_TITLE: 'Converta em Tokens',
+    HOWTOEARN_STEP_3_DESC: 'Seus pontos acumulados são convertidos automaticamente em tokens CNTA reais na sua carteira.',
+    HOWTOEARN_STEP_4_NUM: '4',
+    HOWTOEARN_STEP_4_ICON: '💪',
+    HOWTOEARN_STEP_4_TITLE: 'Conclua Metas para Sacar',
+    HOWTOEARN_STEP_4_DESC: 'Para sacar seus tokens CNTA é necessário que as metas do projeto sejam concluídas. Por isso, precisamos de uma comunidade forte, engajada e crescendo juntos.',
+    HOWTOEARN_CTA_TITLE: 'Quer começar a ganhar?',
+    HOWTOEARN_CTA_DESC: 'Baixe agora nossos aplicativos e acumule seus primeiros pontos CNTA.',
+    HOWTOEARN_CTA_ZAP: 'Baixar ZapMoto',
+    HOWTOEARN_CTA_SERV: 'Baixar ServLink',
+    HOWTOEARN_CTA_ECO: 'Ver Ecossistema Completo',
+    HOWTOEARN_CTA_ALL: 'Ver Ecossistema Completo'
+  },
+  ECOSYSTEM: {
+    TITLE: 'Ecossistema',
+    SUBTITLE: 'Aplicativos e serviços que utilizam o CNTA',
+    ZAP_TITLE: 'ZapMoto',
+    ZAP_DESC: 'Aplicativo de mototáxi, entregas, mobilidade urbana, empregos e serviços.',
+    ZAP_LINK: 'Baixar na Play Store',
+    SERV_TITLE: 'ServLink',
+    SERV_DESC: 'Divulgação de vagas, prestação de serviços e contratação de profissionais.',
+    SERV_LINK: 'Baixar na Play Store',
+    CONNECTA_TITLE: 'Connecta Beats',
+    CONNECTA_DESC: 'Hub principal do ecossistema CNTA: conteúdo musical com IA e utilitários do token.',
+    CONNECTA_TAG: 'Acessar Web App',
+    MUSIC_TITLE: 'Music SKS',
+    MUSIC_DESC: 'Plataforma musical com IA - músicas distribuídas em Spotify, Apple Music, Deezer e YouTube Music.',
+    MUSIC_LINK: 'Visitar site',
+    YOUTUBE_TITLE: 'The Daily Cut',
+    YOUTUBE_DESC: 'Canal oficial com cortes, séries completas e filmes. Inscreva-se para ajudar a bater a meta de 1.000 inscritos e ganhar pontos CNTA.',
+    YOUTUBE_LINK: 'Inscrever-se no YouTube',
+    BENEFITS_TITLE: 'Benefícios do Token',
+    BEN_CASHBACK: 'Cashback',
+    BEN_CASHBACK_DESC: 'Receba de volta parte do valor gasto nos serviços do ecossistema.',
+    BEN_REWARDS: 'Recompensas',
+    BEN_REWARDS_DESC: 'Programa de metas com recompensas em tokens para participação ativa.',
+    BEN_REFERRAL: 'Programa de Indicação',
+    BEN_REFERRAL_DESC: 'Convide amigos e ganhe benefícios exclusivos.',
+    BEN_EXCLUSIVE: 'Benefícios Exclusivos',
+    BEN_EXCLUSIVE_DESC: 'Acesso a vantagens e produtos exclusivos para detentores de CNTA.',
+    BEN_INTEGRATION: 'Integração com Apps',
+    BEN_INTEGRATION_DESC: 'Utilize o token em todos os aplicativos do ecossistema.',
+    TECH_TITLE: 'Tecnologia e Inovação',
+    TECH_BLOCKCHAIN: 'Blockchain Polygon',
+    TECH_AI: 'Inteligência Artificial',
+    TECH_MOBILE: 'Aplicativos Mobile',
+    TECH_ECONOMY: 'Economia Digital',
+    TECH_MUSIC: 'Música com IA',
+    TECH_MOBILITY: 'Mobilidade Urbana'
+  },
+  GOALS: {
+    TITLE: 'Metas',
+    PHASE_1: 'Meta 1 — Fundação do Ecossistema',
+    STATUS_IN_PROGRESS: 'Em Andamento',
+    DESC: 'A primeira etapa do programa tem como objetivo validar o crescimento inicial e a capacidade de geração de atividade do ecossistema.',
+    CRITERIA_TITLE: 'Critérios para conclusão',
+    CRITERIA_1: '1.000 usuários ativos nos aplicativos do ecossistema',
+    CRITERIA_2: '2.000 ouvintes mensais nas plataformas de música',
+    CRITERIA_3: '100.000 visualizações nas redes sociais',
+    CRITERIA_4: '10.000 seguidores nas redes sociais',
+    CRITERIA_5: '2 parceiros comerciais integrados ao ecossistema',
+    CRITERIA_6: 'R$ 500 de receita mensal proveniente das atividades do ecossistema',
+    REWARD_TITLE: 'Recompensa',
+    REWARD_TEXT: 'Após o cumprimento de todos os critérios, serão desbloqueados:',
+    REWARD_AMOUNT: '100.000 tokens',
+    REWARD_DEST: 'Os tokens desbloqueados serão destinados ao programa de recompensas e distribuídos entre os participantes elegíveis de acordo com o sistema de pontos e as regras de participação estabelecidas pelo projeto.',
+    NOTE_1: 'Caso qualquer um dos critérios não seja atingido, a Meta 1 será considerada não concluída, e os 100.000 tokens permanecerão na reserva de recompensas até que uma futura meta seja alcançada.',
+    NOTE_2: 'Todas as métricas e o resultado da meta serão apresentados no relatório de transparência do projeto.',
+    YT_BADGE: 'Meta YouTube — Entretenimento',
+    YT_STATUS: 'Em Andamento',
+    YT_TITLE: 'Canal The Daily Cut: 1.000 Inscritos',
+    YT_DESC: 'Meta comunitária para impulsionar o canal oficial de entretenimento do ecossistema (cortes, séries e filmes). Quando o canal atingir 1.000 inscritos, todos os usuários cadastrados nos aplicativos serão premiados.',
+    YT_CRITERIA_TITLE: 'Critério para conclusão',
+    YT_CRITERIA_VALUE: '1.000',
+    YT_CRITERIA_LABEL: 'inscritos no canal YouTube The Daily Cut',
+    YT_REWARD_TITLE: '🎁 Recompensa Comunitária',
+    YT_REWARD_TEXT: 'Quando a meta for atingida, o prêmio abaixo será liberado para todos os participantes elegíveis:',
+    YT_REWARD_AMOUNT: '150 pontos CNTA',
+    YT_REWARD_DEST: 'por usuário cadastrado e ativo nos aplicativos ZapMoto e ServLink.',
+    YT_NOTE_1: '⚠️ A contagem de inscritos considera apenas contas reais e ativas. A data corte para elegibilidade será divulgada quando a meta estiver 90% concluída.',
+    YT_NOTE_2: '📺 Para ajudar a bater a meta, se inscreva no canal e compartilhe com amigos e familiares!',
+    YT_CTA_TEXT: 'Ajudar a bater a meta',
+    YT_CTA_LINK: 'Inscrever-se no YouTube →'
+  },
+  WHITEPAPER: {
+    TITLE: 'Whitepaper',
+    OVERVIEW_TITLE: 'Visão Geral do Ecossistema',
+    OVERVIEW_P1: 'O projeto tem como objetivo construir um ecossistema digital integrado por aplicativos, conteúdo musical, redes sociais, parceiros comerciais e um token desenvolvido na rede Polygon.',
+    OVERVIEW_P2: 'A proposta é criar utilidade real para o ecossistema por meio do crescimento dos aplicativos, expansão da comunidade, produção de conteúdo, geração de receita e estabelecimento de parcerias.',
+    REWARDS_TITLE: 'Programa de Metas e Recompensas',
+    REWARDS_P1: 'O ecossistema contará com um programa de metas baseado em indicadores mensuráveis de crescimento e desenvolvimento.',
+    REWARDS_P2: 'As metas poderão considerar:',
+    REWARDS_L1: 'Usuários ativos dos aplicativos',
+    REWARDS_L2: 'Ouvintes e reproduções legítimas de conteúdo musical',
+    REWARDS_L3: 'Crescimento e engajamento nas redes sociais',
+    REWARDS_L4: 'Empresas e parceiros integrados ao ecossistema',
+    REWARDS_L5: 'Receita gerada pelos produtos e serviços',
+    REWARDS_L6: 'Outras métricas relevantes para o desenvolvimento sustentável do projeto',
+    REWARDS_P3: 'Cada meta terá critérios previamente definidos e uma quantidade específica de tokens destinada à recompensa.',
+    REWARDS_P4: 'A quantidade de tokens associada a uma meta somente será desbloqueada quando os critérios publicados forem atingidos. Caso uma meta não seja alcançada, os tokens permanecerão na reserva de recompensas.',
+    DISTRIBUTION_TITLE: 'Distribuição aos Participantes',
+    DISTRIBUTION_P1: 'Após o cumprimento de uma meta, os tokens desbloqueados poderão ser distribuídos entre participantes elegíveis de acordo com um sistema de pontos e participação.',
+    DISTRIBUTION_P2: 'O objetivo é proporcionar uma distribuição proporcional à contribuição de cada participante para o desenvolvimento do ecossistema, utilizando critérios públicos e mecanismos destinados a reduzir atividades fraudulentas ou artificiais.',
+    DISTRIBUTION_P3: 'Os pontos Cnta acumulados pelos usuários nos aplicativos do ecossistema (como ZapMoto, ServLink e Connecta) serão convertidos em tokens CNTA reais, de acordo com a taxa de conversão e os períodos de resgate previamente estabelecidos.',
+    DISTRIBUTION_P4: 'A tabela de conversão de pontos para tokens será divulgada oficialmente antes do início do programa de resgate, respeitando sempre o saldo disponível nas reservas de recompensas desbloqueadas pelo cumprimento das metas do projeto.',
+    SUSTAINABILITY_TITLE: 'Sustentabilidade Financeira',
+    SUST_P1: 'O projeto buscará gerar receita por meio de publicidade, patrocínios, parcerias comerciais, monetização de conteúdo, serviços de tecnologia e outras atividades relacionadas ao ecossistema.',
+    SUST_P2: 'A geração de receita não dependerá exclusivamente da negociação do token.',
+    SUST_P3: 'Uma política de liquidez poderá estabelecer que uma parcela do lucro líquido do ecossistema seja destinada à liquidez do token. Como referência inicial, poderá ser destinado até 10% do lucro líquido, desde que o resultado financeiro seja positivo e as obrigações operacionais, fiscais e legais estejam devidamente consideradas.',
+    SUST_P4: 'A adição de liquidez tem como objetivo fortalecer o funcionamento do mercado do token e não representa garantia de valorização, retorno financeiro ou recuperação do capital investido.',
+    TRANSPARENCY_TITLE: 'Transparência',
+    TRANS_P1: 'A transparência será um dos princípios fundamentais do projeto.',
+    TRANS_P2: 'O site oficial poderá disponibilizar um painel público contendo:',
+    TRANS_L1: 'Progresso das metas',
+    TRANS_L2: 'Indicadores dos aplicativos',
+    TRANS_L3: 'Dados de audiência e conteúdo',
+    TRANS_L4: 'Crescimento das redes sociais',
+    TRANS_L5: 'Parceiros do ecossistema',
+    TRANS_L6: 'Receitas e despesas relevantes',
+    TRANS_L7: 'Quantidade de tokens distribuídos',
+    TRANS_L8: 'Tokens restantes nas reservas',
+    TRANS_L9: 'Histórico das distribuições',
+    TRANS_L10: 'Informações e transações relacionadas à liquidez',
+    TRANS_P3: 'Relatórios periódicos serão publicados para apresentar a evolução do projeto, permitindo que a comunidade acompanhe os resultados, metas atingidas, metas não atingidas e utilização das reservas.',
+    PRINCIPLE_TITLE: 'Princípio Fundamental',
+    PRINCIPLE_P1: 'O projeto busca estabelecer um ciclo sustentável:',
+    CYCLE: { GROWTH: 'Crescimento', UTILITY: 'Utilidade', REVENUE: 'Receita', REINVEST: 'Reinvestimento', ACHIEVE: 'Cumprimento de Metas', REWARDS: 'Recompensas' },
+    FINAL_P1: 'O token será apresentado como parte da infraestrutura e do programa de participação do ecossistema, sem promessa de valorização ou retorno financeiro garantido.',
+    FINAL_P2: 'As regras definitivas de tokenomics, distribuição, recompensas e liquidez deverão ser publicadas antes da implementação oficial e poderão ser submetidas a revisão jurídica e contábil conforme a legislação aplicável.'
+  },
+  TOKENOMICS: {
+    TITLE: 'Tokenomia',
+    PRICE_TITLE: 'Preço em Tempo Real',
+    PAIR: 'USD',
+    VOLUME_24H: 'Volume (24h)',
+    MCAP: 'FDV / MCAP',
+    UPDATED: 'Atualizado',
+    REFRESH: 'Atualizar preço',
+    LOADING_ERROR: 'Não foi possível carregar o preço no momento. Tente novamente em instantes.',
+    DATA_UNAVAILABLE: 'Dados do token não disponíveis no momento.',
+    RETRY: 'Tentar Novamente',
+    PERIOD_24H: '24h',
+    SUPPLY_TITLE: 'Oferta Total',
+    SUPPLY_VALUE: '100.000.000 CNTA',
+    POOL_TITLE: 'Liquidez na Pool (Uniswap)',
+    POOL_VALUE: '2.109.382,53 CNTA',
+    NETWORK_TITLE: 'Rede',
+    NETWORK_VALUE: 'Polygon',
+    CONTRACT_TITLE: 'Contrato',
+    WALLET_TITLE: 'Carteira Principal do Projeto',
+    WALLET_SUBTITLE: 'Onde estão armazenados os tokens do projeto',
+    WALLET_BUTTON: 'Ver no PolygonScan',
+    ROADMAP_TITLE: 'Roadmap',
+    PHASE_1_NUM: 'Fase 1', PHASE_1_TITLE: 'Criação do Token', PHASE_1_L1: 'Criação do contrato inteligente', PHASE_1_L2: 'Desenvolvimento inicial', PHASE_1_L3: 'Lançamento do site institucional',
+    PHASE_2_NUM: 'Fase 2', PHASE_2_TITLE: 'Integração com Apps', PHASE_2_L1: 'Integração com ZapMoto', PHASE_2_L2: 'Integração com ServLink', PHASE_2_L3: 'Lançamento do App Connecta', PHASE_2_L3_TAG: 'em desenvolvimento', PHASE_2_L4: 'Implantação de utilidade',
+    PHASE_3_NUM: 'Fase 3', PHASE_3_TITLE: 'Crescimento da Comunidade', PHASE_3_L1: 'Expansão para novas cidades', PHASE_3_L2: 'Parcerias estratégicas', PHASE_3_L3: 'Crescimento do ecossistema',
+    PHASE_4_NUM: 'Fase 4', PHASE_4_TITLE: 'Marketplace e Novos Serviços', PHASE_4_L1: 'Lançamento do Marketplace', PHASE_4_L2: 'Novos produtos', PHASE_4_L3: 'Expansão internacional'
+  },
+  HELP: {
+    FAQ_TITLE: 'Perguntas Frequentes',
+    FAQ_1_Q: 'O que é o CNTA connecta?', FAQ_1_A: 'O CNTA connecta é um token na rede Polygon que funciona como moeda de um ecossistema completo de aplicativos, incluindo mobilidade urbana, serviços, plataforma musical com IA e muito mais.',
+    FAQ_2_Q: 'Como adquirir CNTA?', FAQ_2_A: 'Você pode adquirir CNTA através da Uniswap na rede Polygon, utilizando o endereço do contrato inteligente oficial do projeto.',
+    FAQ_3_Q: 'Quais aplicativos aceitam o token?', FAQ_3_A: 'Atualmente, os aplicativos ZapMoto e ServLink já estão integrados. Em breve, o app Connecta e outros serviços do ecossistema também aceitarão o token.',
+    FAQ_4_Q: 'Como funciona o programa de recompensas?', FAQ_4_A: 'O programa de recompensas é baseado em metas mensuráveis de crescimento do ecossistema. Ao atingir cada meta, tokens são desbloqueados e distribuídos aos participantes.',
+    FAQ_5_Q: 'O token tem utilidade real?', FAQ_5_A: 'Sim! O CNTA pode ser utilizado para cashback, pagamento de serviços nos aplicativos, participação nas recompensas e benefícios exclusivos dentro de todo o ecossistema.',
+    FAQ_6_Q: 'Em qual rede o CNTA está?', FAQ_6_A: 'O CNTA está na rede Polygon (MATIC), garantindo transações rápidas e com taxas baixas para todos os usuários.',
+    COMMUNITY_TITLE: 'Junte-se à Comunidade',
+    COMMUNITY_SUBTITLE: 'Entre no nosso grupo oficial do WhatsApp e conecte-se com outros participantes do ecossistema CNTA. Receba novidades em primeira mão, tire dúvidas diretamente com a equipe e fique por dentro de todas as atualizações do projeto.',
+    COMMUNITY_CTA: 'Entrar no Grupo do WhatsApp',
+    CONTACT_TITLE: 'Contato',
+    CONTACT_SUBTITLE: 'Siga nossas redes sociais e fique por dentro de todas as novidades!'
+  },
+  FOOTER: { RIGHTS: 'Todos os direitos reservados.', MADE_WITH: 'Feito com', PROJECT: 'pelo ecossistema CNTA' }
+};
+
+class RobustTranslateLoader implements TranslateLoader {
+  constructor(private http: HttpClient) {}
+
+  getTranslation(lang: string) {
+    const http = this.http;
+    const fallback = lang === 'en' ? {} : FALLBACK_PT;
+    return http.get<any>(`/assets/i18n/${lang}.json`, { headers: { 'Cache-Control': 'no-cache' } }).pipe(
+      timeout(8000),
+      catchError((err) => {
+        console.warn('[Translate] Falha ao carregar ' + lang + '.json — usando fallback hardcoded', err?.message || err);
+        return of({ ...fallback, ...(lang === 'en' ? {} : {}) });
+      }),
+      map((payload) => {
+        if (!payload || typeof payload !== 'object') {
+          console.warn('[Translate] Payload inválido para ' + lang + ' — fallback aplicado');
+          return { ...fallback };
+        }
+        if (lang === 'pt') return { ...FALLBACK_PT, ...payload };
+        return { ...FALLBACK_PT, ...payload };
+      })
+    );
+  }
+}
 
 export function HttpLoaderFactory(http: HttpClient) {
-  return new TranslateHttpLoader(http, './assets/i18n/', '.json');
+  return new RobustTranslateLoader(http);
 }
 
 class MyMissingTranslationHandler implements MissingTranslationHandler {
@@ -17,9 +260,37 @@ class MyMissingTranslationHandler implements MissingTranslationHandler {
   }
 }
 
+const PRICE_API_HOSTS = ['api.geckoterminal.com', 'api.dexscreener.com'];
+
+@Injectable()
+class SilentPriceApiErrorHandler implements ErrorHandler {
+  handleError(error: unknown): void {
+    try {
+      if (error instanceof HttpErrorResponse) {
+        const url: string = (error.url || '').toLowerCase();
+        if (PRICE_API_HOSTS.some(h => url.includes(h))) {
+          console.warn('[HTTP] Preço CNTA (silêncio CORS/rede):', error.status, url.substring(0, 70));
+          return;
+        }
+        console.warn('[HTTP] HttpErrorResponse:', error.status, url.substring(0, 100), error?.message?.substring(0, 80));
+        return;
+      }
+      const anyErr = error as any;
+      const msg: string = (anyErr?.message || anyErr?.error?.message || String(anyErr)).substring(0, 120);
+      if (PRICE_API_HOSTS.some(h => msg.toLowerCase().includes(h))) {
+        console.warn('[Price] Erro preço API silenciado:', msg.substring(0, 80));
+        return;
+      }
+      try { console.error(error); } catch {}
+    } catch {
+      try { console.error(error); } catch {}
+    }
+  }
+}
+
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideBrowserGlobalErrorListeners(),
+    { provide: ErrorHandler, useClass: SilentPriceApiErrorHandler },
     provideRouter(routes),
     provideHttpClient(),
     importProvidersFrom(
@@ -30,7 +301,9 @@ export const appConfig: ApplicationConfig = {
           provide: TranslateLoader,
           useFactory: HttpLoaderFactory,
           deps: [HttpClient]
-        }
+        },
+        useDefaultLang: true,
+        isolate: false
       })
     )
   ]

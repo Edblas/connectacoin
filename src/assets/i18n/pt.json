@@ -39,7 +39,6 @@
     "FOUNDER_PILLAR_3_ICON": "🤝",
     "FOUNDER_PILLAR_3_TITLE": "Transparência",
     "FOUNDER_PILLAR_3_DESC": "Toda decisão importante e o progresso das metas são compartilhados com a comunidade.",
-
     "HOWTOEARN_TITLE": "Como Ganhar Tokens CNTA?",
     "HOWTOEARN_SUBTITLE": "É muito simples: acumule pontos e receba tokens reais",
     "HOWTOEARN_CALLOUT": "Os pontos CNTA acumulados nos aplicativos serão convertidos em tokens CNTA.",
@@ -63,7 +62,8 @@
     "HOWTOEARN_CTA_DESC": "Baixe agora nossos aplicativos e acumule seus primeiros pontos CNTA.",
     "HOWTOEARN_CTA_ZAP": "Baixar ZapMoto",
     "HOWTOEARN_CTA_SERV": "Baixar ServLink",
-    "HOWTOEARN_CTA_ECO": "Ver Ecossistema Completo"
+    "HOWTOEARN_CTA_ECO": "Ver Ecossistema Completo",
+    "HOWTOEARN_CTA_ALL": "Ver Ecossistema Completo"
   },
   "ECOSYSTEM": {
     "TITLE": "Ecossistema",
@@ -80,11 +80,10 @@
     "MUSIC_TITLE": "Music SKS",
     "MUSIC_DESC": "Plataforma musical com IA - músicas distribuídas em Spotify, Apple Music, Deezer e YouTube Music.",
     "MUSIC_LINK": "Visitar site",
-    "YOUTUBE_TITLE": "CNTA Cinza",
+    "YOUTUBE_TITLE": "The Daily Cut",
     "YOUTUBE_DESC": "Canal oficial com cortes, séries completas e filmes. Inscreva-se para ajudar a bater a meta de 1.000 inscritos e ganhar pontos CNTA.",
-    "YOUTUBE_LINK": "Inscrever-se no YouTube"
-  },
-  "BENEFITS_TITLE": "Benefícios do Token",
+    "YOUTUBE_LINK": "Inscrever-se no YouTube",
+    "BENEFITS_TITLE": "Benefícios do Token",
     "BEN_CASHBACK": "Cashback",
     "BEN_CASHBACK_DESC": "Receba de volta parte do valor gasto nos serviços do ecossistema.",
     "BEN_REWARDS": "Recompensas",
@@ -123,11 +122,11 @@
     "NOTE_2": "Todas as métricas e o resultado da meta serão apresentados no relatório de transparência do projeto.",
     "YT_BADGE": "Meta YouTube — Entretenimento",
     "YT_STATUS": "Em Andamento",
-    "YT_TITLE": "Canal CNTA Cinza: 1.000 Inscritos",
+    "YT_TITLE": "Canal The Daily Cut: 1.000 Inscritos",
     "YT_DESC": "Meta comunitária para impulsionar o canal oficial de entretenimento do ecossistema (cortes, séries e filmes). Quando o canal atingir 1.000 inscritos, todos os usuários cadastrados nos aplicativos serão premiados.",
     "YT_CRITERIA_TITLE": "Critério para conclusão",
     "YT_CRITERIA_VALUE": "1.000",
-    "YT_CRITERIA_LABEL": "inscritos no canal YouTube CNTA Cinza",
+    "YT_CRITERIA_LABEL": "inscritos no canal YouTube The Daily Cut",
     "YT_REWARD_TITLE": "🎁 Recompensa Comunitária",
     "YT_REWARD_TEXT": "Quando a meta for atingida, o prêmio abaixo será liberado para todos os participantes elegíveis:",
     "YT_REWARD_AMOUNT": "150 pontos CNTA",

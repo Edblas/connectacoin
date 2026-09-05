@@ -1,6 +1,6 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { BehaviorSubject, interval, Subject, takeUntil, catchError, of, tap, timeout, firstValueFrom } from 'rxjs';
+import { BehaviorSubject, Subject, takeUntil, catchError, of, timeout, firstValueFrom, timer, switchMap } from 'rxjs';
 
 export interface TokenPrice {
   priceUsd: string | null;
@@ -38,6 +38,12 @@ interface DexScreenerPair {
   marketCap?: number;
 }
 
+const HTTP_TIMEOUT_MS = 6000;
+const POLL_BASE_MS = 30000;
+const POLL_BACKOFF_STEP = 30000;
+const POLL_MAX_MS = 240000;
+const SILENT_LOG = true;
+
 @Injectable({
   providedIn: 'root'
 })
@@ -65,11 +71,11 @@ export class TokenPriceService implements OnDestroy {
 
   public readonly price$ = this.priceSubject$.asObservable();
 
+  private pollFailures = 0;
+  private pollIntervalMs = POLL_BASE_MS;
+
   constructor(private http: HttpClient) {
-    this.fetchPrice();
-    interval(30000)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => this.fetchPrice());
+    this.scheduleWithBackoff(true);
   }
 
   ngOnDestroy() {
@@ -83,61 +89,81 @@ export class TokenPriceService implements OnDestroy {
     return isNaN(n) ? 0 : n;
   }
 
+  private scheduleWithBackoff(immediate: boolean) {
+    const firstDelay = immediate ? 0 : this.pollIntervalMs;
+    timer(firstDelay)
+      .pipe(
+        takeUntil(this.destroy$),
+        switchMap(async () => {
+          await this.fetchPrice();
+          this.pollIntervalMs = Math.min(
+            POLL_MAX_MS,
+            POLL_BASE_MS + this.pollFailures * POLL_BACKOFF_STEP
+          );
+          this.scheduleWithBackoff(false);
+        })
+      )
+      .subscribe();
+  }
+
+  private silent(msg: string, extra?: unknown) {
+    if (!SILENT_LOG) return;
+    if (extra !== undefined) {
+      console.warn('[TokenPrice]', msg, extra);
+    } else {
+      console.warn('[TokenPrice]', msg);
+    }
+  }
+
   private async fetchPrice() {
     const current = this.priceSubject$.value;
     this.priceSubject$.next({ ...current, loading: true, error: null });
 
-    try {
-      const fromPrimary = await firstValueFrom(
-        this.http.get<any>(this.PRIMARY_API).pipe(
-          timeout(12000),
-          catchError((err: HttpErrorResponse) => {
-            console.warn('[TokenPrice] Primary Pool Gecko falhou:', err?.status || err?.message);
+    const wrapGet = (url: string, label: string) =>
+      firstValueFrom(
+        this.http.get<any>(url).pipe(
+          timeout(HTTP_TIMEOUT_MS),
+          catchError((err: unknown) => {
+            const status = (err as HttpErrorResponse)?.status ?? 0;
+            const shortUrl = url.substring(0, 70);
+            this.silent(`${label} falhou (${status})`, shortUrl);
             return of(null);
           })
         )
       );
 
+    try {
+      const fromPrimary = await wrapGet(this.PRIMARY_API, 'Primary Pool Gecko');
       let result = this.parseFromGeckoPool(fromPrimary);
       if (!result) {
-        const fromSecondary = await firstValueFrom(
-          this.http.get<any>(this.SECONDARY_API).pipe(
-            timeout(12000),
-            catchError(() => of(null))
-          )
-        );
+        const fromSecondary = await wrapGet(this.SECONDARY_API, 'Secondary Pools Gecko');
         result = this.parseFromGeckoPoolsList(fromSecondary);
       }
       if (!result) {
-        const fromLegacy = await firstValueFrom(
-          this.http.get<any>(this.LEGACY_TOKEN_API).pipe(
-            timeout(12000),
-            catchError(() => of(null))
-          )
-        );
+        const fromLegacy = await wrapGet(this.LEGACY_TOKEN_API, 'Legacy Token Gecko');
         result = this.parseFromGeckoTerminal(fromLegacy);
       }
       if (!result) {
-        const fromFallback = await firstValueFrom(
-          this.http.get<any>(this.FALLBACK_API).pipe(
-            timeout(12000),
-            catchError(() => of(null))
-          )
-        );
+        const fromFallback = await wrapGet(this.FALLBACK_API, 'Fallback DexScreener');
         result = this.parseFromDexScreener(fromFallback);
       }
 
       if (result) {
+        this.pollFailures = 0;
         this.priceSubject$.next({ ...result, loading: false, error: null });
       } else {
+        this.pollFailures = Math.min(this.pollFailures + 1, 8);
+        this.silent(`Nenhuma API respondeu (tentativa falha #${this.pollFailures}). Próxima atualização em ${(this.pollIntervalMs / 1000).toFixed(0)}s.`);
         this.priceSubject$.next({
           ...current,
           loading: false,
           error: 'Não foi possível carregar o preço no momento. Tente novamente em instantes.'
         });
       }
-    } catch (err) {
-      console.error('[TokenPrice] Erro fatal ao buscar preço:', err);
+    } catch (err: unknown) {
+      this.pollFailures = Math.min(this.pollFailures + 1, 8);
+      const msg = (err as any)?.message || String(err).substring(0, 80);
+      this.silent(`Erro ao buscar preço: ${msg}`);
       this.priceSubject$.next({
         ...current,
         loading: false,
