@@ -67,5 +67,61 @@
         </p>
       </div>
     </div>
+
+    <div class="meta-card meta-card--youtube">
+      <div class="meta-header">
+        <div class="meta-badge meta-badge--youtube">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" width="18" height="18"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.6 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg>
+          <span>{{ 'GOALS.YT_BADGE' | translate }}</span>
+        </div>
+        <div class="meta-status meta-status--youtube">
+          <span class="status-dot"></span>
+          {{ 'GOALS.YT_STATUS' | translate }}
+        </div>
+      </div>
+
+      <h3 class="meta-yt-title">{{ 'GOALS.YT_TITLE' | translate }}</h3>
+      <p class="meta-description">
+        {{ 'GOALS.YT_DESC' | translate }}
+      </p>
+
+      <div class="meta-block">
+        <h4 class="meta-block-title">🎯 {{ 'GOALS.YT_CRITERIA_TITLE' | translate }}</h4>
+        <ul class="meta-criteria-list meta-criteria-list--single">
+          <li>
+            <span class="criteria-value criteria-value--big">{{ 'GOALS.YT_CRITERIA_VALUE' | translate }}</span>
+            <span class="criteria-label">{{ 'GOALS.YT_CRITERIA_LABEL' | translate }}</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="meta-block meta-reward-block meta-reward-block--youtube">
+        <h4 class="meta-block-title">{{ 'GOALS.YT_REWARD_TITLE' | translate }}</h4>
+        <p class="meta-reward-text">
+          {{ 'GOALS.YT_REWARD_TEXT' | translate }}
+        </p>
+        <div class="meta-reward-amount meta-reward-amount--youtube">
+          <span class="reward-number">{{ 'GOALS.YT_REWARD_AMOUNT' | translate }}</span>
+          <span class="reward-per-user">{{ 'GOALS.YT_REWARD_DEST' | translate }}</span>
+        </div>
+      </div>
+
+      <div class="meta-notes">
+        <p class="meta-note">
+          {{ 'GOALS.YT_NOTE_1' | translate }}
+        </p>
+        <p class="meta-note">
+          {{ 'GOALS.YT_NOTE_2' | translate }}
+        </p>
+      </div>
+
+      <div class="meta-cta-yt">
+        <p class="meta-cta-yt-text">{{ 'GOALS.YT_CTA_TEXT' | translate }}</p>
+        <a href="https://www.youtube.com/channel/UCKlrJDK1GNMU92Z0p2vBBbw" target="_blank" rel="noopener noreferrer" class="btn btn-danger">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" width="16" height="16"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.6 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg>
+          {{ 'GOALS.YT_CTA_LINK' | translate }}
+        </a>
+      </div>
+    </div>
   </div>
 </section>

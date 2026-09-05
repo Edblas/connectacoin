@@ -366,6 +366,27 @@ section {
   border-color: rgba(52, 211, 153, 0.35);
 }
 
+.card-badge--youtube {
+  color: #ff3b3b;
+  background: rgba(255, 0, 0, 0.1);
+  border-color: rgba(255, 59, 59, 0.4);
+}
+
+.ecosystem-card--youtube {
+  border: 1px solid rgba(255, 59, 59, 0.18);
+  background: linear-gradient(165deg, rgba(255, 0, 0, 0.04) 0%, rgba(15, 23, 42, 0.6) 55%, rgba(139, 92, 246, 0.04) 100%);
+}
+
+.ecosystem-card--youtube:hover {
+  transform: translateY(-6px);
+  border-color: rgba(255, 59, 59, 0.55);
+  box-shadow: 0 28px 56px -24px rgba(255, 0, 0, 0.3);
+}
+
+.ecosystem-card--youtube h3 {
+  color: #ff6b6b;
+}
+
 .ecosystem-card a .card-link,
 .ecosystem-card .card-link {
   margin-top: 1.25rem;
@@ -1575,6 +1596,190 @@ section {
   .meta-criteria-list li {
     flex-direction: column;
     gap: 0.25rem;
+  }
+}
+
+/* ========== META YOUTUBE CARD VARIANT ========== */
+.meta-card--youtube {
+  position: relative;
+  margin-top: 3.5rem;
+  padding: 2.25rem 2.5rem;
+  border: 1px solid rgba(255, 59, 59, 0.22);
+  background:
+    radial-gradient(1200px circle at 0% 0%, rgba(255, 0, 0, 0.10) 0%, transparent 55%),
+    radial-gradient(900px circle at 100% 100%, rgba(139, 92, 246, 0.08) 0%, transparent 50%),
+    linear-gradient(165deg, rgba(15, 23, 42, 0.96) 0%, rgba(20, 30, 60, 0.86) 100%);
+  box-shadow: 0 40px 72px -32px rgba(255, 0, 0, 0.22);
+}
+
+.meta-badge--youtube {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
+  color: #ffffff;
+  box-shadow: 0 12px 28px -10px rgba(255, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  padding: 0.5rem 0.9rem;
+  border-radius: 12px;
+}
+
+.meta-status--youtube {
+  color: #ff6b6b;
+  background: rgba(255, 59, 59, 0.1);
+  border: 1px solid rgba(255, 59, 59, 0.3);
+}
+
+.meta-status--youtube .status-dot {
+  background: #ff3b3b;
+  box-shadow: 0 0 0 4px rgba(255, 59, 59, 0.18);
+}
+
+.meta-yt-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  margin: 1.25rem 0 0.75rem;
+  background: linear-gradient(135deg, #ff5a5a 0%, #ff2222 45%, #cc0000 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  line-height: 1.2;
+}
+
+.meta-criteria-list--single {
+  grid-template-columns: 1fr;
+  max-width: 640px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.meta-criteria-list--single li {
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.75rem 1.5rem;
+}
+
+.criteria-value--big {
+  font-size: 3.25rem !important;
+  line-height: 1;
+  background: linear-gradient(135deg, #ff3b3b, #b91c1c);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+.meta-reward-block--youtube {
+  border: 1px solid rgba(255, 59, 59, 0.22);
+  background: linear-gradient(160deg, rgba(255, 0, 0, 0.06) 0%, rgba(30, 41, 59, 0.5) 100%);
+  border-radius: 16px;
+  padding: 1.75rem 2rem;
+}
+
+.meta-reward-amount--youtube {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.5rem 1.5rem 0.5rem;
+  background: linear-gradient(180deg, rgba(255, 59, 59, 0.14) 0%, transparent 75%);
+  border-radius: 14px;
+  margin-top: 1.25rem;
+}
+
+.meta-reward-amount--youtube .reward-number {
+  background: linear-gradient(135deg, #ff5a5a 0%, #ff1e1e 45%, #b91c1c 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 8px 24px rgba(255, 0, 0, 0.18);
+}
+
+.reward-per-user {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-align: center;
+  line-height: 1.5;
+}
+
+.meta-card--youtube .meta-note {
+  border-left-color: #ff3b3b;
+}
+
+.meta-cta-yt {
+  margin-top: 2rem;
+  padding: 1.75rem 2rem;
+  border-radius: 16px;
+  border: 1px dashed rgba(255, 59, 59, 0.4);
+  background: linear-gradient(135deg, rgba(255, 0, 0, 0.05) 0%, rgba(139, 92, 246, 0.04) 100%);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+}
+
+.meta-cta-yt-text {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, #ff1a1a 0%, #cc0000 50%, #990000 100%);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  font-weight: 700;
+  padding: 0.95rem 1.75rem;
+  border-radius: 14px;
+  box-shadow: 0 18px 36px -14px rgba(255, 0, 0, 0.58);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.btn-danger:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+  box-shadow: 0 22px 42px -12px rgba(255, 0, 0, 0.7);
+}
+
+@media (max-width: 768px) {
+  .meta-card--youtube {
+    padding: 1.5rem 1.25rem;
+    margin-top: 2.5rem;
+  }
+
+  .meta-badge--youtube {
+    padding: 0.4rem 0.7rem;
+    font-size: 0.82rem;
+  }
+
+  .meta-yt-title {
+    font-size: 1.35rem;
+  }
+
+  .criteria-value--big {
+    font-size: 2.4rem !important;
+  }
+
+  .meta-reward-block--youtube {
+    padding: 1.25rem 1rem;
+  }
+
+  .meta-cta-yt {
+    padding: 1.25rem 1rem;
+  }
+
+  .btn-danger {
+    width: 100%;
+    justify-content: center;
   }
 }
 
